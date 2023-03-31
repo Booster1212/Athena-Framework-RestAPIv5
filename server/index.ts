@@ -8,6 +8,11 @@ import session from 'express-session';
 import passport from 'passport';
 import DiscordStrategy from 'passport-discord';
 
+import { Request, Response, NextFunction } from 'express';
+
+import routes from './config/routes';
+
+const app = express();
 interface User {
     accessToken: string;
     refreshToken: string;
@@ -56,8 +61,6 @@ passport.deserializeUser(async (user: any, done: any) => {
     return done(null, userData);
 });
 
-const app = express();
-
 app.use(
     session({
         secret: 'someSecret',
@@ -65,11 +68,12 @@ app.use(
         saveUninitialized: false,
     }),
 );
+app.use('/', routes);
 
 app.use(passport.initialize());
 app.use(passport.session());
 
-async function isAuthenticated(req: any, res: any, next: any) {
+export async function isAuthenticated(req: Request, res: Response, next: NextFunction) {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
     if (!token) {
@@ -85,40 +89,16 @@ async function isAuthenticated(req: any, res: any, next: any) {
     }
 }
 
-app.get('/api/protected', isAuthenticated, async (req: any, res: any) => {
-    const user = req.user;
-    res.send(`Welcome, ${user.username}#${user.discriminator}!`);
-});
-
-app.get('/api/protected/accounts', isAuthenticated, async (req: any, res: any) => {
-    const accountCollection = await Database.fetchAllData('accounts');
-    res.send(accountCollection);
-});
-
-app.get('/api/protected/characters', isAuthenticated, async (req: any, res: any) => {
-    const characterCollection = await Database.fetchAllData('characters');
-    res.send(characterCollection);
-});
-
-app.get('/api/protected/items', isAuthenticated, async (req: any, res: any) => {
-    const itemCollection = await Database.fetchAllData('items');
-    res.send(itemCollection);
-});
-
-app.get('/api/protected/vehicles', isAuthenticated, async (req: any, res: any) => {
-    const vehicleCollection = await Database.fetchAllData('vehicles');
-    res.send(vehicleCollection);
-});
-
-app.get('/auth', passport.authenticate('discord'));
-app.get(
-    '/auth/callback',
-    passport.authenticate('discord', {
-        successRedirect: '/api/protected',
-        failureRedirect: '/',
-    }),
-);
-
 app.listen(9970, async () => {
     console.log(`Athena Framework - Rest API Server listening on port 9970`);
+    console.log(`Registered Routes:`);
+    app._router.stack.forEach((middleware: any) => {
+        if (middleware.route) {
+            console.log(`${Object.keys(middleware.route.methods)} - ${middleware.route.path}`);
+        } else if (middleware.name === 'router') {
+            middleware.handle.stack.forEach((handler) => {
+                console.log(`${Object.keys(handler.route.methods)} - ${handler.route.path}`);
+            });
+        }
+    });
 });
