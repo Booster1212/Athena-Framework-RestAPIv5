@@ -10,28 +10,26 @@ import { OwnedVehicle } from '@AthenaShared/interfaces/vehicleOwned';
 const router = express.Router();
 
 router.get('/api/protected/accounts', isAuthenticated, async (req: Request, res: Response) => {
-    const accountCollection = await Database.fetchAllData<Account>('accounts');
-    res.send(accountCollection);
+    return res.send(await Database.fetchAllData<Account>('accounts'));
 });
 
 router.get('/api/protected/characters', isAuthenticated, async (req: Request, res: Response) => {
-    const characterCollection = await Database.fetchAllData<Character>('characters');
-    res.send(characterCollection);
+    return res.send(await Database.fetchAllData<Character>('characters'));
 });
 
 router.get('/api/protected/items', isAuthenticated, async (req: Request, res: Response) => {
-    const itemCollection = await Database.fetchAllData<BaseItem>('items');
-    res.send(itemCollection);
+    return res.send(await Database.fetchAllData<BaseItem>('items'));
 });
 
 router.get('/api/protected/vehicles', isAuthenticated, async (req: Request, res: Response) => {
-    const vehicleCollection = await Database.fetchAllData<OwnedVehicle>('vehicles');
-    res.send(vehicleCollection);
+    return res.send(await Database.fetchAllData<OwnedVehicle>('vehicles'));
 });
 
 router.get('/api/welcome', async (req: any, res: Response) => {
     const user = req.user;
-    res.send(`You have authenticated yourself successfully!`);
+    res.send(
+        `You have authenticated yourself successfully! Check the Database 'api-users' to retrieve your axios accessToken.`,
+    );
 });
 
 router.get('/auth', passport.authenticate('discord'));

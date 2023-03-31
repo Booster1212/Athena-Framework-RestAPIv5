@@ -11,6 +11,7 @@ import DiscordStrategy from 'passport-discord';
 import { Request, Response, NextFunction } from 'express';
 
 import routes from './config/routes';
+import './axiosExample';
 
 const app = express();
 interface User {
