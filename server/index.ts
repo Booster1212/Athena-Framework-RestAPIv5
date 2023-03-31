@@ -8,10 +8,6 @@ import session from 'express-session';
 import passport from 'passport';
 import DiscordStrategy from 'passport-discord';
 
-import dotenv from 'dotenv';
-
-dotenv.config();
-
 interface User {
     accessToken: string;
     refreshToken: string;
@@ -24,8 +20,8 @@ interface User {
 passport.use(
     new DiscordStrategy(
         {
-            clientID: process.env.DISCORD_CLIENT_ID as string,
-            clientSecret: process.env.DISCORD_CLIENT_SECRET as string,
+            clientID: APIConfig.general.DISCORD_CLIENT_ID,
+            clientSecret: APIConfig.general.DISCORD_CLIENT_SECRET,
             callbackURL: APIConfig.general.callbackURL,
             scope: ['identify', 'email'],
         },
@@ -123,11 +119,6 @@ app.get(
     }),
 );
 
-app.listen(3000, async () => {
-    const connectionAthenaDatabase = await Database.init(`mongodb://0.0.0.0:27017`, APIConfig.general.athenaDatabase, [
-        APIConfig.general.collection,
-    ]);
-    
-    console.log(`Athena Framework - Rest API Server listening on port 3000`);
-    console.log(`Established Athena Database Connection? ${connectionAthenaDatabase}`);
+app.listen(9970, async () => {
+    console.log(`Athena Framework - Rest API Server listening on port 9970`);
 });

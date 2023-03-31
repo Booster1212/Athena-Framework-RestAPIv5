@@ -1,0 +1,4 @@
+{
+    "dependencies": ["express", "express-session", "passport", "passport-discord"],
+    "devDependencies": ["@types/express", "@types/express-session", "@types/passport", "@types/passport-discord"]
+}
